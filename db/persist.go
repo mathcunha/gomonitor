@@ -1,9 +1,8 @@
 package db
 
 import (
-	"labix.org/v2/mgo"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"fmt"
 )
 
 func getSession() (*mgo.Session, error){
@@ -15,12 +14,14 @@ func closeSession(s *mgo.Session){
 	s.Close()
 }
 
-func FindOne(collection string, id bson.M, result *MonitorDB) error{
+func FindOne(collection string, id bson.M, result interface{}) error{
 	s, err := getSession()
-	fmt.Println(err)
-	fmt.Println(id)
-	err = s.DB("gomonitor").C(collection).FindId(id).One(result)
-	fmt.Println(err)
-	closeSession(s)
+	if err != nil {
+		panic(err)
+	}
+	defer closeSession(s)
+
+	err = s.DB("gomonitor").C(collection).Find(id).One(result)
+
 	return err
 }

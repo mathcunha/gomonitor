@@ -6,13 +6,11 @@ import (
 	"strings"
 	"../db"
 )
-
+type Monitor struct{}
 type ServiceHandler interface{
 	get(w http.ResponseWriter)
 	getOne(w http.ResponseWriter, id string)
 }
-
-type Monitor struct{}
 
 func getId(r *http.Request) string{
 	data := strings.Split(r.URL.Path,"/")
@@ -44,7 +42,6 @@ func DoRequest (w http.ResponseWriter, r *http.Request) {
 	switch{
 	case "GET" == r.Method:
 		id := getId(r)
-		fmt.Printf("temos um GET - %v \n", id)
 		if(id != ""){
 			monitorHandler.getOne(w, id)
 		}else{
@@ -63,8 +60,9 @@ func (monitor Monitor) get (w http.ResponseWriter){
 func (monitor Monitor) getOne (w http.ResponseWriter, id string){
 	err, result := db.FindOneMonitor(id)
 	if err == nil{
-        	fmt.Fprintf(w, "<h1>Editing %s</h1>", result)
+		fmt.Println(result)
+		fmt.Fprintf(w, "%s %s", result.Threshold, result.Query)
 	}else{
-		fmt.Fprintf(w, "<h1>Editing %s</h1>", err)
+		fmt.Fprintf(w, "error %s", err)
 	}
 }
