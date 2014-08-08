@@ -5,6 +5,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+const database = "gomonitor"
+
 func getSession() (*mgo.Session, error){
 	session, err := mgo.Dial("mongodb://127.0.0.1")
 	return session, err
@@ -21,7 +23,48 @@ func FindOne(collection string, id bson.M, result interface{}) error{
 	}
 	defer closeSession(s)
 
-	err = s.DB("gomonitor").C(collection).Find(id).One(result)
+	err = s.DB(database).C(collection).Find(id).One(result)
+
+	return err
+}
+
+func FindAll(collection string, result interface{}) error{
+	s, err := getSession()
+	if err != nil {
+		panic(err)
+	}
+
+	defer closeSession(s)
+
+	err = s.DB(database).C(collection).Find(nil).All(result)
+
+	return err
+}
+
+func Insert(collection string, document interface{}) error{
+	s, err := getSession()
+        if err != nil {
+                panic(err)
+        }
+        defer closeSession(s)
+
+	s.SetSafe(&mgo.Safe{FSync: true})
+
+	err = s.DB(database).C(collection).Insert(document)
+
+	return err
+}
+
+func Remove(collection string, id bson.M) error{
+	s, err := getSession()
+	if err != nil {
+		panic(err)
+	}
+	defer closeSession(s)
+
+	s.SetSafe(&mgo.Safe{FSync: true})
+
+	err = s.DB(database).C(collection).Remove(id)
 
 	return err
 }

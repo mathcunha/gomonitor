@@ -1,17 +1,43 @@
 package db
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"gopkg.in/mgo.v2/bson"
+	"encoding/json"
+)
+
+const collection = "monitor"
 
 type Monitor struct{
-	Id		bson.ObjectId	"_id,omitempty"
-	Query		string		"query"
-	Threshold	int
-	Interval	string
-	field		string
+	Id		bson.ObjectId	`bson:"_id,omitempty"   json:"id"`
+	Query		string		`bson:"query,omitempty" json:"query"`
+	Threshold	int		`bson:"threshold"       json:"threshold"`
+	Interval	string		`bson:"interval"        json:"interval"`
+	field		string		`bson:"field"           json:"field"`
 }
 
 func FindOneMonitor(id string) (error, Monitor){
 	var monitor Monitor
-	err := FindOne("monitor",bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
+	err := FindOne(collection,bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
 	return err, monitor
+}
+
+func FindAllMonitor() (error, []Monitor){
+	var monitors []Monitor 
+	err := FindAll(collection, &monitors)
+	return err, monitors
+}
+
+func InsertMonitor (decoder *json.Decoder) (error, Monitor){
+	var monitor Monitor
+	err := decoder.Decode(&monitor)
+
+	if (err != nil){
+		return err, monitor
+	}
+
+	return Insert(collection, &monitor), monitor
+}
+
+func RemoveMonitor(id string) (error){
+	return Remove(collection,bson.M{"_id": bson.ObjectIdHex(id)})
 }

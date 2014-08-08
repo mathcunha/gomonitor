@@ -5,11 +5,14 @@ import (
 	"net/http"
 	"strings"
 	"../db"
+	"encoding/json"
 )
 type Monitor struct{}
 type ServiceHandler interface{
-	get(w http.ResponseWriter)
-	getOne(w http.ResponseWriter, id string)
+	getAll() (error, interface{})
+	getOne(id string) (error, interface{})
+	insert(decode *json.Decoder) (error, interface{})
+	removeOne (id string) (error)
 }
 
 func getId(r *http.Request) string{
@@ -39,30 +42,43 @@ func DoRequest (w http.ResponseWriter, r *http.Request) {
 	var monitorHandler ServiceHandler
 	monitorHandler = getHandler(r.URL.Path)
 
+	var err error
+	var result interface{}
+
 	switch{
 	case "GET" == r.Method:
 		id := getId(r)
 		if(id != ""){
-			monitorHandler.getOne(w, id)
+			err, result = monitorHandler.getOne(id)
 		}else{
-			monitorHandler.get(w)
+			err, result = monitorHandler.getAll()
 		}
 	case "DELETE" == r.Method:
-		fmt.Printf("temos um DELETE - %v \n", getId(r))
+		err = monitorHandler.removeOne(getId(r))
 	case "POST" == r.Method:
-		fmt.Println("temos um POST")
+		decoder := json.NewDecoder(r.Body)
+		err, result = monitorHandler.insert(decoder)
 	}
-}
 
-func (monitor Monitor) get (w http.ResponseWriter){
-	fmt.Fprintf(w, "<h1>Editing %s</h1>", "GET")
-}
-func (monitor Monitor) getOne (w http.ResponseWriter, id string){
-	err, result := db.FindOneMonitor(id)
 	if err == nil{
-		fmt.Println(result)
-		fmt.Fprintf(w, "%s %s", result.Threshold, result.Query)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(result)
 	}else{
 		fmt.Fprintf(w, "error %s", err)
 	}
+}
+
+func (monitor Monitor) getOne (id string) (error, interface{}){
+	return db.FindOneMonitor(id)
+}
+func (monitor Monitor) insert (decoder *json.Decoder)(error, interface{}){
+	return db.InsertMonitor(decoder)
+}
+
+func (monitor Monitor) getAll()(error, interface{}){
+	return db.FindAllMonitor()
+}
+
+func (monitor Monitor) removeOne (id string) (error){
+	return db.RemoveMonitor(id)
 }
