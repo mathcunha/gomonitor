@@ -7,7 +7,11 @@ import (
 	"../db"
 	"encoding/json"
 )
+
 type Monitor struct{}
+type Sendmail struct{}
+type Alert struct{}
+
 type ServiceHandler interface{
 	getAll() (error, interface{})
 	getOne(id string) (error, interface{})
@@ -33,6 +37,10 @@ func getHandler(path string) ServiceHandler{
 	a_path := strings.Split(path,"/")
 	if "monitor" == a_path[1]{
 		return Monitor{}
+	}else if "sendmail" == a_path[1]{
+		return Sendmail{}
+	}else if "alert" == a_path[1]{
+		return Alert{}
 	}
 	return nil
 }
@@ -68,6 +76,8 @@ func DoRequest (w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+
 func (monitor Monitor) getOne (id string) (error, interface{}){
 	return db.FindOneMonitor(id)
 }
@@ -82,3 +92,41 @@ func (monitor Monitor) getAll()(error, interface{}){
 func (monitor Monitor) removeOne (id string) (error){
 	return db.RemoveMonitor(id)
 }
+
+func (alert Alert) getOne (id string) (error, interface{}){
+	return db.FindOneAlert(id)
+}
+func (alert Alert) insert (decoder *json.Decoder)(error, interface{}){
+
+	err, alert_db := db.InsertAlert(decoder)
+
+	for _, value := range alert_db.Monitor.Endpoints{
+		fmt.Println ("%v", value)
+	}
+
+	return err, alert
+}
+
+func (alert Alert) getAll()(error, interface{}){
+	return db.FindAllAlert()
+}
+
+func (alert Alert) removeOne (id string) (error){
+	return db.RemoveAlert(id)
+}
+
+func (sendmail Sendmail) getOne (id string) (error, interface{}){
+	return db.FindOneSendmail(id)
+}
+func (sendmail Sendmail) insert (decoder *json.Decoder)(error, interface{}){
+	return db.InsertSendmail(decoder)
+}
+
+func (sendmail Sendmail) getAll()(error, interface{}){
+	return db.FindAllSendmail()
+}
+
+func (sendmail Sendmail) removeOne (id string) (error){
+	return db.RemoveSendmail(id)
+}
+

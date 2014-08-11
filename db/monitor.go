@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 )
 
-const collection = "monitor"
+var collection = "monitor"
 
 type Monitor struct{
 	Id		bson.ObjectId	`bson:"_id,omitempty"   json:"id"`
 	Query		string		`bson:"query,omitempty" json:"query"`
 	Threshold	int		`bson:"threshold"       json:"threshold"`
 	Interval	string		`bson:"interval"        json:"interval"`
-	field		string		`bson:"field"           json:"field"`
+	Field		string		`bson:"field"           json:"field"`
+	Endpoints	[]string	`bson:"endpoints"       json:"endpoints"`
 }
 
 func FindOneMonitor(id string) (error, Monitor){

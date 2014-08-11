@@ -28,7 +28,7 @@ func FindOne(collection string, id bson.M, result interface{}) error{
 	return err
 }
 
-func FindAll(collection string, result interface{}) error{
+func FindQuery(collection string, result interface{}, query interface{}) error{
 	s, err := getSession()
 	if err != nil {
 		panic(err)
@@ -36,9 +36,13 @@ func FindAll(collection string, result interface{}) error{
 
 	defer closeSession(s)
 
-	err = s.DB(database).C(collection).Find(nil).All(result)
+	err = s.DB(database).C(collection).Find(query).All(result)
 
 	return err
+}
+
+func FindAll(collection string, result interface{}) error{
+	return FindQuery(collection, result, nil)
 }
 
 func Insert(collection string, document interface{}) error{
