@@ -1,44 +1,44 @@
 package db
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var collection = "monitor"
 
-type Monitor struct{
-	Id		bson.ObjectId	`bson:"_id,omitempty"   json:"id"`
-	Query		string		`bson:"query,omitempty" json:"query"`
-	Threshold	int		`bson:"threshold"       json:"threshold"`
-	Interval	string		`bson:"interval"        json:"interval"`
-	Field		string		`bson:"field"           json:"field"`
-	Endpoints	[]string	`bson:"endpoints"       json:"endpoints"`
+type Monitor struct {
+	Id        bson.ObjectId `bson:"_id,omitempty"   json:"id"`
+	Query     string        `bson:"query,omitempty" json:"query"`
+	Threshold int           `bson:"threshold"       json:"threshold"`
+	Interval  string        `bson:"interval"        json:"interval"`
+	Field     string        `bson:"field"           json:"field"`
+	Endpoints []string      `bson:"endpoints"       json:"endpoints"`
 }
 
-func FindOneMonitor(id string) (error, Monitor){
+func FindOneMonitor(id string) (error, Monitor) {
 	var monitor Monitor
-	err := FindOne(collection,bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
+	err := FindOne(collection, bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
 	return err, monitor
 }
 
-func FindAllMonitor() (error, []Monitor){
-	var monitors []Monitor 
+func FindAllMonitor() (error, []Monitor) {
+	var monitors []Monitor
 	err := FindAll(collection, &monitors)
 	return err, monitors
 }
 
-func InsertMonitor (decoder *json.Decoder) (error, Monitor){
+func InsertMonitor(decoder *json.Decoder) (error, Monitor) {
 	var monitor Monitor
 	err := decoder.Decode(&monitor)
 
-	if (err != nil){
+	if err != nil {
 		return err, monitor
 	}
 
 	return Insert(collection, &monitor), monitor
 }
 
-func RemoveMonitor(id string) (error){
-	return Remove(collection,bson.M{"_id": bson.ObjectIdHex(id)})
+func RemoveMonitor(id string) error {
+	return Remove(collection, bson.M{"_id": bson.ObjectIdHex(id)})
 }
