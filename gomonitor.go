@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/monitor/", handler.DoRequest)
+	http.HandleFunc("/", handler.DoRequest)
 	http.ListenAndServe(":8080", nil)
 }

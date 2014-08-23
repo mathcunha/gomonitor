@@ -34,6 +34,19 @@ func InsertSendmail(decoder *json.Decoder) (error, Sendmail) {
 	return Insert("sendmail", &sendmail), sendmail
 }
 
+func ActionSendmail(decoder *json.Decoder) (error, Alert) {
+	var alert Alert
+        err := decoder.Decode(&alert)
+
+	if err != nil {
+                return err, alert
+        }
+
+	//TODO sendmail stuff
+
+	return err, alert
+}
+
 func RemoveSendmail(id string) error {
 	return Remove("sendmail", bson.M{"_id": bson.ObjectIdHex(id)})
 }

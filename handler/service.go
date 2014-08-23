@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/mathcunha/gomonitor/db"
 	"log"
 	"net/http"
@@ -10,7 +9,13 @@ import (
 )
 
 type Monitor struct{}
-type Sendmail struct{}
+
+type Sendmail Action
+
+type Action struct{
+        action string
+}
+
 type Alert struct{}
 
 type ServiceHandler interface {
@@ -36,10 +41,11 @@ func getId(r *http.Request) string {
 
 func getHandler(path string) ServiceHandler {
 	a_path := strings.Split(path, "/")
+
 	if "monitor" == a_path[1] {
 		return Monitor{}
 	} else if "sendmail" == a_path[1] {
-		return Sendmail{}
+		return Sendmail{a_path[2]}
 	} else if "alert" == a_path[1] {
 		return Alert{}
 	}
@@ -49,11 +55,11 @@ func getHandler(path string) ServiceHandler {
 func DoRequest(w http.ResponseWriter, r *http.Request) {
 
 	var monitorHandler ServiceHandler
-	//monitorHandler = getHandler(r.URL.Path)
 
 	if monitorHandler = getHandler(r.URL.Path); monitorHandler == nil {
 		http.Error(w, "no handler", http.StatusNotFound)
 		log.Printf("handling %q", r.RequestURI)
+		return
 	}
 
 	var err error
@@ -74,13 +80,14 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 		err, result = monitorHandler.insert(decoder)
 	}
 
-	if err == nil {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(result)
-	} else {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Printf("handling %q: %v", r.RequestURI, err)
+	if err != nil {
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                log.Printf("handling %q: %v", r.RequestURI, err)
+                return
 	}
+
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(result)
 }
 
 func (monitor Monitor) getOne(id string) (error, interface{}) {
@@ -105,8 +112,9 @@ func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 
 	err, alert_db := db.InsertAlert(decoder)
 
-	for _, value := range alert_db.Monitor.Endpoints {
-		fmt.Println("%v", value)
+	for _, value := range alert_db.Monitor.Actions {
+		log.Printf("posting alert to %v", value)
+		//TODO - curl action and post alert
 	}
 
 	return err, alert
@@ -124,7 +132,13 @@ func (sendmail Sendmail) getOne(id string) (error, interface{}) {
 	return db.FindOneSendmail(id)
 }
 func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
-	return db.InsertSendmail(decoder)
+	log.Printf("sendmail.action = [%v]", sendmail.action)
+
+	if "action" == sendmail.action{
+		return db.ActionSendmail(decoder)
+	}else{
+		return db.InsertSendmail(decoder)
+	}
 }
 
 func (sendmail Sendmail) getAll() (error, interface{}) {
