@@ -16,19 +16,19 @@ type Monitor struct {
 	Actions   []string      `bson:"actions"         json:"actions"`
 }
 
-func FindOneMonitor(id string) (error, Monitor) {
+func (m Monitor) FindOne(id string) (error, Monitor) {
 	var monitor Monitor
 	err := FindOne(collection, bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
 	return err, monitor
 }
 
-func FindAllMonitor() (error, []Monitor) {
+func (m Monitor) FindAll() (error, []Monitor) {
 	var monitors []Monitor
 	err := FindAll(collection, &monitors)
 	return err, monitors
 }
 
-func InsertMonitor(decoder *json.Decoder) (error, Monitor) {
+func (m Monitor) Insert(decoder *json.Decoder) (error, Monitor) {
 	var monitor Monitor
 	err := decoder.Decode(&monitor)
 
@@ -39,6 +39,6 @@ func InsertMonitor(decoder *json.Decoder) (error, Monitor) {
 	return Insert(collection, &monitor), monitor
 }
 
-func RemoveMonitor(id string) error {
+func (m Monitor) Remove(id string) error {
 	return Remove(collection, bson.M{"_id": bson.ObjectIdHex(id)})
 }

@@ -13,19 +13,19 @@ type Alert struct {
 	When     time.Time     `bson:"when"            json:"when"`
 }
 
-func FindOneAlert(id string) (error, Alert) {
+func (a Alert) FindOne(id string) (error, Alert) {
 	var alert Alert
 	err := FindOne("alert", bson.M{"_id": bson.ObjectIdHex(id)}, &alert)
 	return err, alert
 }
 
-func FindAllAlert() (error, []Alert) {
+func (a Alert) FindAll() (error, []Alert) {
 	var alerts []Alert
 	err := FindAll("alert", &alerts)
 	return err, alerts
 }
 
-func InsertAlert(decoder *json.Decoder) (error, Alert) {
+func (a Alert) Insert(decoder *json.Decoder) (error, Alert) {
 	var alert Alert
 	err := decoder.Decode(&alert)
 	alert.When = time.Now()
@@ -37,6 +37,6 @@ func InsertAlert(decoder *json.Decoder) (error, Alert) {
 	return Insert("alert", &alert), alert
 }
 
-func RemoveAlert(id string) error {
+func (a Alert) Remove(id string) error {
 	return Remove("alert", bson.M{"_id": bson.ObjectIdHex(id)})
 }

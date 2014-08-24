@@ -91,27 +91,32 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func (monitor Monitor) getOne(id string) (error, interface{}) {
-	return db.FindOneMonitor(id)
+func (m Monitor) getOne(id string) (error, interface{}) {
+	var monitor db.Monitor
+	return monitor.FindOne(id)
 }
-func (monitor Monitor) insert(decoder *json.Decoder) (error, interface{}) {
-	return db.InsertMonitor(decoder)
-}
-
-func (monitor Monitor) getAll() (error, interface{}) {
-	return db.FindAllMonitor()
+func (m Monitor) insert(decoder *json.Decoder) (error, interface{}) {
+	var monitor db.Monitor
+	return monitor.Insert(decoder)
 }
 
-func (monitor Monitor) removeOne(id string) error {
-	return db.RemoveMonitor(id)
+func (m Monitor) getAll() (error, interface{}) {
+	var monitor db.Monitor
+	return monitor.FindAll()
+}
+
+func (m Monitor) removeOne(id string) error {
+	var monitor db.Monitor
+	return monitor.Remove(id)
 }
 
 func (alert Alert) getOne(id string) (error, interface{}) {
-	return db.FindOneAlert(id)
+	var a db.Alert
+	return a.FindOne(id)
 }
 func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
-
-	err, alert_db := db.InsertAlert(decoder)
+	var a db.Alert
+	err, alert_db := a.Insert(decoder)
 
 	for _, value := range alert_db.Monitor.Actions {
 		log.Printf("posting alert to %v", value)
@@ -125,30 +130,36 @@ func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 }
 
 func (alert Alert) getAll() (error, interface{}) {
-	return db.FindAllAlert()
+	var a db.Alert
+	return a.FindAll()
 }
 
 func (alert Alert) removeOne(id string) error {
-	return db.RemoveAlert(id)
+	var a db.Alert
+	return a.Remove(id)
 }
 
 func (sendmail Sendmail) getOne(id string) (error, interface{}) {
-	return db.FindOneSendmail(id)
+	var s db.Sendmail
+	return s.FindOne(id)
 }
 func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
+	var s db.Sendmail
 	log.Printf("sendmail.action = [%v]", sendmail.action)
 
 	if "action" == sendmail.action {
-		return db.ActionSendmail(decoder)
+		return s.Action(decoder)
 	} else {
-		return db.InsertSendmail(decoder)
+		return s.Insert(decoder)
 	}
 }
 
 func (sendmail Sendmail) getAll() (error, interface{}) {
-	return db.FindAllSendmail()
+	var s db.Sendmail
+	return s.FindAll()
 }
 
 func (sendmail Sendmail) removeOne(id string) error {
-	return db.RemoveSendmail(id)
+	var s db.Sendmail
+	return s.Remove(id)
 }

@@ -12,19 +12,19 @@ type Sendmail struct {
 	To      []string      `bson:"to"              json:"to"`
 }
 
-func FindOneSendmail(id string) (error, Sendmail) {
+func (s Sendmail) FindOne(id string) (error, Sendmail) {
 	var sendmail Sendmail
 	err := FindOne("sendmail", bson.M{"_id": bson.ObjectIdHex(id)}, &sendmail)
 	return err, sendmail
 }
 
-func FindAllSendmail() (error, []Sendmail) {
+func (s Sendmail) FindAll() (error, []Sendmail) {
 	var sendmails []Sendmail
 	err := FindAll("sendmail", &sendmails)
 	return err, sendmails
 }
 
-func InsertSendmail(decoder *json.Decoder) (error, Sendmail) {
+func (s Sendmail) Insert(decoder *json.Decoder) (error, Sendmail) {
 	var sendmail Sendmail
 	err := decoder.Decode(&sendmail)
 
@@ -35,7 +35,7 @@ func InsertSendmail(decoder *json.Decoder) (error, Sendmail) {
 	return Insert("sendmail", &sendmail), sendmail
 }
 
-func ActionSendmail(decoder *json.Decoder) (error, Alert) {
+func (s Sendmail) Action(decoder *json.Decoder) (error, Alert) {
 	var alert Alert
 	err := decoder.Decode(&alert)
 
@@ -49,6 +49,6 @@ func ActionSendmail(decoder *json.Decoder) (error, Alert) {
 	return err, alert
 }
 
-func RemoveSendmail(id string) error {
+func (s Sendmail) Remove(id string) error {
 	return Remove("sendmail", bson.M{"_id": bson.ObjectIdHex(id)})
 }
