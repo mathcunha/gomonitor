@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/mathcunha/gomonitor/db"
 	"log"
@@ -12,8 +13,8 @@ type Monitor struct{}
 
 type Sendmail Action
 
-type Action struct{
-        action string
+type Action struct {
+	action string
 }
 
 type Alert struct{}
@@ -58,7 +59,7 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 
 	if monitorHandler = getHandler(r.URL.Path); monitorHandler == nil {
 		http.Error(w, "no handler", http.StatusNotFound)
-		log.Printf("handling %q", r.RequestURI)
+		log.Printf("1 - error handling %q", r.RequestURI)
 		return
 	}
 
@@ -81,13 +82,13 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-                http.Error(w, err.Error(), http.StatusInternalServerError)
-                log.Printf("handling %q: %v", r.RequestURI, err)
-                return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("2 - error handling %q: %v", r.RequestURI, err)
+		return
 	}
 
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(result)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func (monitor Monitor) getOne(id string) (error, interface{}) {
@@ -114,7 +115,10 @@ func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 
 	for _, value := range alert_db.Monitor.Actions {
 		log.Printf("posting alert to %v", value)
-		//TODO - curl action and post alert
+		var postData []byte
+		w := bytes.NewBuffer(postData)
+		json.NewEncoder(w).Encode(alert_db)
+		http.Post("http://127.0.0.1:8080/"+value+"/action", "application/json", w)
 	}
 
 	return err, alert
@@ -134,9 +138,9 @@ func (sendmail Sendmail) getOne(id string) (error, interface{}) {
 func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 	log.Printf("sendmail.action = [%v]", sendmail.action)
 
-	if "action" == sendmail.action{
+	if "action" == sendmail.action {
 		return db.ActionSendmail(decoder)
-	}else{
+	} else {
 		return db.InsertSendmail(decoder)
 	}
 }

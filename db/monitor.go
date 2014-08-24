@@ -13,7 +13,7 @@ type Monitor struct {
 	Threshold int           `bson:"threshold"       json:"threshold"`
 	Interval  string        `bson:"interval"        json:"interval"`
 	Field     string        `bson:"field"           json:"field"`
-	Actions []string        `bson:"actions"         json:"actions"`
+	Actions   []string      `bson:"actions"         json:"actions"`
 }
 
 func FindOneMonitor(id string) (error, Monitor) {

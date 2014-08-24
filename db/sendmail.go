@@ -3,6 +3,7 @@ package db
 import (
 	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 type Sendmail struct {
@@ -36,13 +37,14 @@ func InsertSendmail(decoder *json.Decoder) (error, Sendmail) {
 
 func ActionSendmail(decoder *json.Decoder) (error, Alert) {
 	var alert Alert
-        err := decoder.Decode(&alert)
+	err := decoder.Decode(&alert)
 
 	if err != nil {
-                return err, alert
-        }
+		return err, alert
+	}
 
 	//TODO sendmail stuff
+	log.Printf("sending email - [%v]", alert.Monitor.Id)
 
 	return err, alert
 }

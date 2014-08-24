@@ -3,15 +3,14 @@ package db
 import (
 	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
-        "time"
+	"time"
 )
 
 type Alert struct {
-	Id       bson.ObjectId `bson:"_id,omitempty"   json:"id"`
+	Id       bson.ObjectId `bson:"_id,omitempty"   json:"id,omitempty"`
 	Monitor  Monitor       `bson:"monitor"         json:"monitor"`
 	Measured int           `bson:"measured"        json:"measured"`
-        When     time.Time     `bson:"when"            json:"when"`
-
+	When     time.Time     `bson:"when"            json:"when"`
 }
 
 func FindOneAlert(id string) (error, Alert) {
@@ -29,7 +28,7 @@ func FindAllAlert() (error, []Alert) {
 func InsertAlert(decoder *json.Decoder) (error, Alert) {
 	var alert Alert
 	err := decoder.Decode(&alert)
-        alert.When = time.Now()
+	alert.When = time.Now()
 
 	if err != nil {
 		return err, alert
