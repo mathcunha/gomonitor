@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ func callElasticsearch(query string) string {
 	body := strings.Replace(query, "\\", "", -1)
 	w.Write([]byte(body))
 
-	res, err := http.Post("http://127.0.0.1:9200/logstash-2014.09.08/_search", "application/json", w)
+	res, err := http.Post("http://127.0.0.1:9200/"+getIndex()+"/_search", "application/json", w)
 
 	if err != nil {
 		log.Fatal(err)
@@ -33,5 +34,11 @@ func callElasticsearch(query string) string {
 		return ""
 	}
 	return string(robots[:])
+}
 
+func getIndex() string{
+	t := time.Now()
+        y := t.AddDate(0,0,-1)
+
+        return t.Format("2006.01.02")+","+y.Format("2006.01.02")
 }
