@@ -64,9 +64,9 @@ func getInterval(interval string) time.Duration {
 		switch {
 		case "h" == duration:
 			return time.Duration(num) * time.Hour
-		case "s" == duration:
-			return time.Duration(num) * time.Minute
 		case "m" == duration:
+			return time.Duration(num) * time.Minute
+		case "s" == duration:
 			return time.Duration(num) * time.Second
 		}
 	}
