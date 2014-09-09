@@ -8,12 +8,10 @@ import (
 var collection = "monitor"
 
 type Monitor struct {
-	Id        bson.ObjectId `bson:"_id,omitempty"   json:"id"`
-	Query     string        `bson:"query,omitempty" json:"query"`
-	Threshold int           `bson:"threshold"       json:"threshold"`
-	Interval  string        `bson:"interval"        json:"interval"`
-	Field     string        `bson:"field"           json:"field"`
-	Actions   []string      `bson:"actions"         json:"actions"`
+	Id       bson.ObjectId `bson:"_id,omitempty"   json:"id"`
+	Query    string        `bson:"query,omitempty" json:"query"`
+	Interval string        `bson:"interval"        json:"interval"`
+	Actions  []string      `bson:"actions"         json:"actions"`
 }
 
 func (m Monitor) FindOne(id string) (error, Monitor) {

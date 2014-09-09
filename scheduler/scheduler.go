@@ -34,12 +34,12 @@ func LoadMonitors() {
 }
 
 func schedule(t *time.Ticker, q chan bool, m db.Monitor) {
-	//TODO - call elasticsearch
+	Evaluate(m)
 	for {
 		select {
 		case <-t.C:
-			log.Printf("event ")
-			//TODO - call elasticsearch
+			log.Printf("event - %v", m.Id)
+			Evaluate(m)
 		case <-q:
 			t.Stop()
 			return
