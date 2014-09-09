@@ -1,0 +1,23 @@
+gomonitor
+=========
+
+What if your logstash metrics stored at Elasticsearch were monitored? Yeah...
+
+This projects aims to monitor the metrics colleted by logstash and take actions when something happens. Those actions could be send a email, or run a script, which are native to the project. But you can develop your own actions.
+
+api
+=========
+To achieve that goal, was developed an REST API that has two major resources, Monitor, Actions (e.g Sendmail, etc.). The first represents what is been monitored (e.g. apache response time, JVM memory) and the second represents the action the should be taken when a monitor alerts.
+
+example
+=========
+To start monitor a metric, you should insert a monitor, as the command below.
+
+curl -XPOST http://localhost:8080/monitor -d '{"query":"{\"query\" : {\"bool\" : {\"must\": [{\"match\" : {\"@fields.request\" : {\"query\" : \"/MYAPP\", \"type\":\"phrase_prefix\"}}},{\"range\" : {\"@timestamp\" : {\"gte\" : \"now-15m\"}}},{\"range\" : {\"@fields.reqmsecs\" : {\"gte\" : 175328151}}}]}}}","interval":"15m","actions":["sendmail"]}'
+
+The property query represts a Elasticseach query, the property interval the time between each monitor call, and the property actions a array of actions.
+
+Once a monitor is inserted, the Gomonitor will schedule a Goroutine tha calls the query and alert if the itens returned are bigger than zero.
+
+
+
