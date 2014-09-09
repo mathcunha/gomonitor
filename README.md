@@ -13,7 +13,9 @@ example
 =========
 To start monitor a metric, you should insert a monitor, as the command below.
 
+```javascript
 curl -XPOST http://localhost:8080/monitor -d '{"query":"{\"query\" : {\"bool\" : {\"must\": [{\"match\" : {\"@fields.request\" : {\"query\" : \"/MYAPP\", \"type\":\"phrase_prefix\"}}},{\"range\" : {\"@timestamp\" : {\"gte\" : \"now-15m\"}}},{\"range\" : {\"@fields.reqmsecs\" : {\"gte\" : 175328151}}}]}}}","interval":"15m","actions":["sendmail"]}'
+```
 
 The property query represts a Elasticseach query, the property interval the time between each monitor call, and the property actions a array of actions.
 
