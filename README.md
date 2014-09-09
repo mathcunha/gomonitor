@@ -7,7 +7,7 @@ This projects aims to monitor the metrics colleted by logstash and take actions 
 
 api
 =========
-To achieve that goal, was developed an REST API that has two major resources, Monitor, Actions (e.g Sendmail, etc.). The first represents what is been monitored (e.g. apache response time, JVM memory) and the second represents the action the should be taken when a monitor alerts.
+To achieve that goal, Gomonitor exposes an REST API, this API has two major resources, Monitor, Actions (e.g Sendmail, etc.). The first represents what is been monitored (e.g. apache response time, JVM memory) and the second represents the action that should be taken when a monitor alerts.
 
 example
 =========
