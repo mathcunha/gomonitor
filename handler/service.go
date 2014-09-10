@@ -3,6 +3,8 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/mathcunha/gomonitor/action"
 	"github.com/mathcunha/gomonitor/db"
 	"log"
 	"net/http"
@@ -46,7 +48,11 @@ func getHandler(path string) ServiceHandler {
 	if "monitor" == a_path[1] {
 		return Monitor{}
 	} else if "sendmail" == a_path[1] {
-		return Sendmail{a_path[2]}
+		if len(a_path) >= 3 {
+			return Sendmail{a_path[2]}
+		} else {
+			return Sendmail{a_path[1]}
+		}
 	} else if "alert" == a_path[1] {
 		return Alert{}
 	}
@@ -148,7 +154,25 @@ func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 	log.Printf("sendmail.action = [%v]", sendmail.action)
 
 	if "action" == sendmail.action {
-		return s.Action(decoder)
+		var alert db.Alert
+		err := decoder.Decode(&alert)
+
+		if err != nil {
+			return err, alert
+		}
+
+		log.Printf("monitor %v", alert.Monitor)
+
+		err, s = s.FindByMonitor(alert.Monitor)
+
+		if err != nil {
+			log.Printf("You must insert a sendmail to monitor %v ", alert.Monitor.Id)
+			return err, alert
+		}
+
+		action.SimpleSendMail(s.From, s.To, fmt.Sprintf("%v", alert.Monitor.Id), fmt.Sprintf("%v", alert))
+
+		return err, s
 	} else {
 		return s.Insert(decoder)
 	}

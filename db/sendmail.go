@@ -10,6 +10,7 @@ type Sendmail struct {
 	Id      bson.ObjectId `bson:"_id,omitempty"   json:"id"`
 	Monitor Monitor       `bson:"monitor"      json:"monitor"`
 	To      []string      `bson:"to"              json:"to"`
+	From    string        `bson:"from"              json:"from"`
 }
 
 func (s Sendmail) FindOne(id string) (error, Sendmail) {
@@ -22,6 +23,12 @@ func (s Sendmail) FindAll() (error, []Sendmail) {
 	var sendmails []Sendmail
 	err := FindAll("sendmail", &sendmails)
 	return err, sendmails
+}
+
+func (s Sendmail) FindByMonitor(m Monitor) (error, Sendmail) {
+	var sendmail Sendmail
+	err := FindOne("sendmail", bson.M{"monitor._id": m.Id}, &sendmail)
+	return err, sendmail
 }
 
 func (s Sendmail) Insert(decoder *json.Decoder) (error, Sendmail) {
