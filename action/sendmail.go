@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"github.com/mathcunha/gomonitor/prop"
 	"net/smtp"
 	"text/template"
 )
@@ -41,7 +42,7 @@ func SimpleSendMail(from string, to []string, subject string, body string) error
 		return err
 	}
 
-	return simpleSendMail("127.0.0.1:25", context.From, context.To, doc.Bytes())
+	return simpleSendMail(prop.Property("smtp"), context.From, context.To, doc.Bytes())
 }
 
 func simpleSendMail(endpoint string, from string, to []string, msg []byte) error {

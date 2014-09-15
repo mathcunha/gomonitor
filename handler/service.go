@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mathcunha/gomonitor/action"
 	"github.com/mathcunha/gomonitor/db"
+	"github.com/mathcunha/gomonitor/prop"
 	"log"
 	"net/http"
 	"strings"
@@ -129,7 +130,7 @@ func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 		var postData []byte
 		w := bytes.NewBuffer(postData)
 		json.NewEncoder(w).Encode(alert_db)
-		http.Post("http://127.0.0.1:8080/"+value+"/action", "application/json", w)
+		http.Post("http://"+prop.Property("gomonitor")+"/"+value+"/action", "application/json", w)
 	}
 
 	return err, alert

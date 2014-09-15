@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/mathcunha/gomonitor/prop"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -8,7 +9,7 @@ import (
 const database = "gomonitor"
 
 func getSession() (*mgo.Session, error) {
-	session, err := mgo.Dial("mongodb://127.0.0.1")
+	session, err := mgo.Dial("mongodb://" + prop.Property("mongodb"))
 	return session, err
 }
 

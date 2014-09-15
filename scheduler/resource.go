@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/mathcunha/gomonitor/db"
+	"github.com/mathcunha/gomonitor/prop"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -58,7 +59,7 @@ func PostAlert(alert db.Alert) {
 	var postData []byte
 	w := bytes.NewBuffer(postData)
 	json.NewEncoder(w).Encode(alert)
-	http.Post("http://127.0.0.1:8080/alert", "application/json", w)
+	http.Post("http://"+prop.Property("gomonitor")+"/alert", "application/json", w)
 }
 
 func callElasticsearch(query string) string {
@@ -66,7 +67,7 @@ func callElasticsearch(query string) string {
 	w := bytes.NewBuffer(postData)
 	w.Write([]byte(query))
 
-	res, err := http.Post("http://127.0.0.1:9200/"+getIndex()+"/_search", "application/json", w)
+	res, err := http.Post("http://"+prop.Property("elasticsearch")+"/"+getIndex()+"/_search", "application/json", w)
 
 	if err != nil {
 		log.Fatal(err)
