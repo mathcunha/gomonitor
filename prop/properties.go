@@ -1,6 +1,7 @@
 package prop
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -35,5 +36,11 @@ func loadConfig() map[string]*json.RawMessage {
 }
 
 func Property(key string) string {
-	return string([]byte(*properties[key])[:])
+	var value string
+	decoder := json.NewDecoder(bytes.NewBuffer([]byte(*properties[key])))
+	err := decoder.Decode(&value)
+	if err != nil {
+		log.Printf("property %v not found - %v", key, err)
+	}
+	return value
 }
