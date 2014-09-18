@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-func LoadMonitors() {
+func LoadMonitors() error {
 	var monitor db.Monitor
-	err, monitors := monitor.FindAll()
+	monitors, err := monitor.FindAll()
 
 	if err != nil {
-		log.Printf("error loading montitors %v", err)
-		panic(err)
+		log.Printf("error loading the montitors %v", err)
+		return err
 	}
 
 	length := len(monitors)
@@ -31,6 +31,7 @@ func LoadMonitors() {
 			go schedule(tickers[i], controls[i], m)
 		}
 	}
+	return nil
 }
 
 func schedule(t *time.Ticker, q chan bool, m db.Monitor) {

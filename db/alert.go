@@ -16,12 +16,8 @@ func (a Alert) collection() string {
 	return "alert"
 }
 
-func (a Alert) FindAll() (error, []Alert) {
+func (a Alert) FindAll() ([]Alert, error) {
 	var alerts []Alert
-	err := FindAll("alert", &alerts)
-	return err, alerts
-}
-
-func (a Alert) Remove(id string) error {
-	return Remove("alert", bson.M{"_id": bson.ObjectIdHex(id)})
+	err := FindAll(a.collection(), &alerts)
+	return alerts, err
 }

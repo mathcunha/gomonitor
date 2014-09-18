@@ -17,10 +17,10 @@ func (s Sendmail) collection() string {
 	return "sendmail"
 }
 
-func (s Sendmail) FindAll() (error, []Sendmail) {
+func (s Sendmail) FindAll() ([]Sendmail, error) {
 	var sendmails []Sendmail
-	err := FindAll("sendmail", &sendmails)
-	return err, sendmails
+	err := FindAll(s.collection(), &sendmails)
+	return sendmails, err
 }
 
 func (s Sendmail) FindByMonitor(m Monitor) (error, Sendmail) {
@@ -28,20 +28,16 @@ func (s Sendmail) FindByMonitor(m Monitor) (error, Sendmail) {
 	return FindOne(sendmail, bson.M{"monitor._id": m.Id}), *sendmail
 }
 
-func (s Sendmail) Action(decoder *json.Decoder) (error, Alert) {
+func (s Sendmail) Action(decoder *json.Decoder) (Alert, error) {
 	var alert Alert
 	err := decoder.Decode(&alert)
 
 	if err != nil {
-		return err, alert
+		return alert, err
 	}
 
 	//TODO sendmail stuff
 	log.Printf("sending email - [%v]", alert.Monitor.Id)
 
-	return err, alert
-}
-
-func (s Sendmail) Remove(id string) error {
-	return Remove("sendmail", bson.M{"_id": bson.ObjectIdHex(id)})
+	return alert, err
 }

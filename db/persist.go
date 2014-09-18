@@ -28,7 +28,7 @@ func GetId(id string) bson.M {
 func FindOne(document Persistent, id bson.M) error {
 	s, err := getSession()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer closeSession(s)
 
@@ -38,14 +38,12 @@ func FindOne(document Persistent, id bson.M) error {
 func FindQuery(collection string, result interface{}, query interface{}) error {
 	s, err := getSession()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer closeSession(s)
 
-	err = s.DB(database).C(collection).Find(query).All(result)
-
-	return err
+	return s.DB(database).C(collection).Find(query).All(result)
 }
 
 func FindAll(collection string, result interface{}) error {
@@ -55,27 +53,23 @@ func FindAll(collection string, result interface{}) error {
 func Insert(document Persistent) error {
 	s, err := getSession()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer closeSession(s)
 
 	s.SetSafe(&mgo.Safe{FSync: true})
 
-	err = s.DB(database).C(document.collection()).Insert(document)
-
-	return err
+	return s.DB(database).C(document.collection()).Insert(document)
 }
 
-func Remove(collection string, id bson.M) error {
+func Remove(document Persistent, id bson.M) error {
 	s, err := getSession()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer closeSession(s)
 
 	s.SetSafe(&mgo.Safe{FSync: true})
 
-	err = s.DB(database).C(collection).Remove(id)
-
-	return err
+	return s.DB(database).C(document.collection()).Remove(id)
 }

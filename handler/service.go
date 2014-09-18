@@ -23,23 +23,17 @@ type Action struct {
 type Alert struct{}
 
 type ServiceHandler interface {
-	getAll() (error, interface{})
-	getOne(id string) (error, interface{})
-	insert(decode *json.Decoder) (error, interface{})
+	getAll() (interface{}, error)
+	getOne(id string) (interface{}, error)
+	insert(decode *json.Decoder) (interface{}, error)
 	removeOne(id string) error
 }
 
 func getId(r *http.Request) string {
 	data := strings.Split(r.URL.Path, "/")
-
-	//for i, v := range data{
-	//	fmt.Printf("indice = valor | %d = %d\n", i, v)
-	//}
-
 	if len(data) > 2 {
 		return data[2]
 	}
-
 	return ""
 }
 
@@ -65,8 +59,8 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 	var monitorHandler ServiceHandler
 
 	if monitorHandler = getHandler(r.URL.Path); monitorHandler == nil {
-		http.Error(w, "no handler", http.StatusNotFound)
-		log.Printf("1 - error handling %q", r.RequestURI)
+		http.Error(w, "no handler to path "+r.URL.Path, http.StatusNotFound)
+		log.Printf("no handler to path [%v]", r.URL.Path)
 		return
 	}
 
@@ -77,20 +71,20 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 	case "GET" == r.Method:
 		id := getId(r)
 		if id != "" {
-			err, result = monitorHandler.getOne(id)
+			result, err = monitorHandler.getOne(id)
 		} else {
-			err, result = monitorHandler.getAll()
+			result, err = monitorHandler.getAll()
 		}
 	case "DELETE" == r.Method:
 		err = monitorHandler.removeOne(getId(r))
 	case "POST" == r.Method:
 		decoder := json.NewDecoder(r.Body)
-		err, result = monitorHandler.insert(decoder)
+		result, err = monitorHandler.insert(decoder)
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Printf("2 - error handling %q: %v", r.RequestURI, err)
+		http.Error(w, err.Error(), http.StatusNotImplemented)
+		log.Printf("error handling %q: %v", r.RequestURI, err)
 		return
 	}
 
@@ -98,41 +92,41 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func (m Monitor) getOne(id string) (error, interface{}) {
+func (m Monitor) getOne(id string) (interface{}, error) {
 	monitor := new(db.Monitor)
-	return db.FindOne(monitor, db.GetId(id)), monitor
+	return monitor, db.FindOne(monitor, db.GetId(id))
 }
-func (m Monitor) insert(decoder *json.Decoder) (error, interface{}) {
+func (m Monitor) insert(decoder *json.Decoder) (interface{}, error) {
 	var monitor db.Monitor
 	err := decoder.Decode(&monitor)
 
 	if err != nil {
-		return err, monitor
+		return monitor, err
 	}
 
-	return db.Insert(monitor), monitor
+	return monitor, db.Insert(monitor)
 }
 
-func (m Monitor) getAll() (error, interface{}) {
+func (m Monitor) getAll() (interface{}, error) {
 	var monitor db.Monitor
 	return monitor.FindAll()
 }
 
 func (m Monitor) removeOne(id string) error {
 	var monitor db.Monitor
-	return monitor.Remove(id)
+	return db.Remove(monitor, db.GetId(id))
 }
 
-func (alert Alert) getOne(id string) (error, interface{}) {
+func (alert Alert) getOne(id string) (interface{}, error) {
 	a := new(db.Alert)
-	return db.FindOne(a, db.GetId(id)), a
+	return a, db.FindOne(a, db.GetId(id))
 }
 
-func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
+func (alert Alert) insert(decoder *json.Decoder) (interface{}, error) {
 	var a db.Alert
 	err := decoder.Decode(&a)
 	if err != nil {
-		return err, a
+		return a, err
 	}
 
 	err, alert_db := db.Insert(a), a
@@ -145,25 +139,25 @@ func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 		http.Post("http://"+prop.Property("gomonitor")+"/"+value+"/action", "application/json", w)
 	}
 
-	return err, alert
+	return a, err
 }
 
-func (alert Alert) getAll() (error, interface{}) {
+func (alert Alert) getAll() (interface{}, error) {
 	var a db.Alert
 	return a.FindAll()
 }
 
 func (alert Alert) removeOne(id string) error {
 	var a db.Alert
-	return a.Remove(id)
+	return db.Remove(a, db.GetId(id))
 }
 
-func (sendmail Sendmail) getOne(id string) (error, interface{}) {
+func (sendmail Sendmail) getOne(id string) (interface{}, error) {
 	s := new(db.Sendmail)
-	return db.FindOne(s, db.GetId(id)), s
+	return s, db.FindOne(s, db.GetId(id))
 }
 
-func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
+func (sendmail Sendmail) insert(decoder *json.Decoder) (interface{}, error) {
 	var s db.Sendmail
 	log.Printf("sendmail.action = [%v]", sendmail.action)
 
@@ -172,7 +166,7 @@ func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 		err := decoder.Decode(&alert)
 
 		if err != nil {
-			return err, alert
+			return alert, err
 		}
 
 		log.Printf("monitor %v", alert.Monitor)
@@ -181,27 +175,27 @@ func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 
 		if err != nil {
 			log.Printf("You must insert a sendmail to monitor %v ", alert.Monitor.Id)
-			return err, alert
+			return alert, err
 		}
 
 		action.SimpleSendMail(s.From, s.To, fmt.Sprintf("%v", alert.Monitor.Id), fmt.Sprintf("%v", alert))
 
-		return err, s
+		return alert, err
 	} else {
 		err := decoder.Decode(&s)
 		if err != nil {
-			return err, s
+			return s, err
 		}
-		return db.Insert(s), s
+		return s, db.Insert(s)
 	}
 }
 
-func (sendmail Sendmail) getAll() (error, interface{}) {
+func (sendmail Sendmail) getAll() (interface{}, error) {
 	var s db.Sendmail
 	return s.FindAll()
 }
 
 func (sendmail Sendmail) removeOne(id string) error {
 	var s db.Sendmail
-	return s.Remove(id)
+	return db.Remove(s, db.GetId(id))
 }
