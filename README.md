@@ -9,6 +9,18 @@ api
 =========
 To achieve that goal, Gomonitor exposes an REST API, this API has two major resources, Monitor, Actions (e.g Sendmail, etc.). The first represents what is been monitored (e.g. apache response time, JVM memory) and the second represents the action that should be taken when a monitor alerts.
 
+setup
+=========
+After clone the project, you should edit de <i>prop/config.json</i> file, providing some basic informations, like elasticsearch and gomonitor url.
+```json
+{
+"elasticsearch" : "127.0.0.1:9200",
+"smtp" : "127.0.0.1:25",
+"gomonitor" : "127.0.0.1:8080",
+"mongodb" : "127.0.0.1"
+}
+```
+
 example
 =========
 To start monitor a metric, you should insert a monitor, as the command below.
