@@ -13,10 +13,8 @@ type Sendmail struct {
 	From    string        `bson:"from"              json:"from"`
 }
 
-func (s Sendmail) FindOne(id string) (error, Sendmail) {
-	var sendmail Sendmail
-	err := FindOne("sendmail", bson.M{"_id": bson.ObjectIdHex(id)}, &sendmail)
-	return err, sendmail
+func (s Sendmail) collection() string {
+	return "sendmail"
 }
 
 func (s Sendmail) FindAll() (error, []Sendmail) {
@@ -26,20 +24,8 @@ func (s Sendmail) FindAll() (error, []Sendmail) {
 }
 
 func (s Sendmail) FindByMonitor(m Monitor) (error, Sendmail) {
-	var sendmail Sendmail
-	err := FindOne("sendmail", bson.M{"monitor._id": m.Id}, &sendmail)
-	return err, sendmail
-}
-
-func (s Sendmail) Insert(decoder *json.Decoder) (error, Sendmail) {
-	var sendmail Sendmail
-	err := decoder.Decode(&sendmail)
-
-	if err != nil {
-		return err, sendmail
-	}
-
-	return Insert("sendmail", &sendmail), sendmail
+	sendmail := new(Sendmail)
+	return FindOne(sendmail, bson.M{"monitor._id": m.Id}), *sendmail
 }
 
 func (s Sendmail) Action(decoder *json.Decoder) (error, Alert) {

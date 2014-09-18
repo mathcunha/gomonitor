@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -14,27 +13,14 @@ type Monitor struct {
 	Actions  []string      `bson:"actions"         json:"actions"`
 }
 
-func (m Monitor) FindOne(id string) (error, Monitor) {
-	var monitor Monitor
-	err := FindOne(collection, bson.M{"_id": bson.ObjectIdHex(id)}, &monitor)
-	return err, monitor
+func (m Monitor) collection() string {
+	return "monitor"
 }
 
 func (m Monitor) FindAll() (error, []Monitor) {
 	var monitors []Monitor
 	err := FindAll(collection, &monitors)
 	return err, monitors
-}
-
-func (m Monitor) Insert(decoder *json.Decoder) (error, Monitor) {
-	var monitor Monitor
-	err := decoder.Decode(&monitor)
-
-	if err != nil {
-		return err, monitor
-	}
-
-	return Insert(collection, &monitor), monitor
 }
 
 func (m Monitor) Remove(id string) error {

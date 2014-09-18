@@ -6,6 +6,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type Persistent interface {
+	collection() string
+}
+
 const database = "gomonitor"
 
 func getSession() (*mgo.Session, error) {
@@ -17,16 +21,18 @@ func closeSession(s *mgo.Session) {
 	s.Close()
 }
 
-func FindOne(collection string, id bson.M, result interface{}) error {
+func GetId(id string) bson.M {
+	return bson.M{"_id": bson.ObjectIdHex(id)}
+}
+
+func FindOne(document Persistent, id bson.M) error {
 	s, err := getSession()
 	if err != nil {
 		panic(err)
 	}
 	defer closeSession(s)
 
-	err = s.DB(database).C(collection).Find(id).One(result)
-
-	return err
+	return s.DB(database).C(document.collection()).Find(id).One(document)
 }
 
 func FindQuery(collection string, result interface{}, query interface{}) error {
@@ -46,7 +52,7 @@ func FindAll(collection string, result interface{}) error {
 	return FindQuery(collection, result, nil)
 }
 
-func Insert(collection string, document interface{}) error {
+func Insert(document Persistent) error {
 	s, err := getSession()
 	if err != nil {
 		panic(err)
@@ -55,7 +61,7 @@ func Insert(collection string, document interface{}) error {
 
 	s.SetSafe(&mgo.Safe{FSync: true})
 
-	err = s.DB(database).C(collection).Insert(document)
+	err = s.DB(database).C(document.collection()).Insert(document)
 
 	return err
 }

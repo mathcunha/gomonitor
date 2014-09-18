@@ -99,12 +99,18 @@ func DoRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m Monitor) getOne(id string) (error, interface{}) {
-	var monitor db.Monitor
-	return monitor.FindOne(id)
+	monitor := new(db.Monitor)
+	return db.FindOne(monitor, db.GetId(id)), monitor
 }
 func (m Monitor) insert(decoder *json.Decoder) (error, interface{}) {
 	var monitor db.Monitor
-	return monitor.Insert(decoder)
+	err := decoder.Decode(&monitor)
+
+	if err != nil {
+		return err, monitor
+	}
+
+	return db.Insert(monitor), monitor
 }
 
 func (m Monitor) getAll() (error, interface{}) {
@@ -118,12 +124,18 @@ func (m Monitor) removeOne(id string) error {
 }
 
 func (alert Alert) getOne(id string) (error, interface{}) {
-	var a db.Alert
-	return a.FindOne(id)
+	a := new(db.Alert)
+	return db.FindOne(a, db.GetId(id)), a
 }
+
 func (alert Alert) insert(decoder *json.Decoder) (error, interface{}) {
 	var a db.Alert
-	err, alert_db := a.Insert(decoder)
+	err := decoder.Decode(&a)
+	if err != nil {
+		return err, a
+	}
+
+	err, alert_db := db.Insert(a), a
 
 	for _, value := range alert_db.Monitor.Actions {
 		log.Printf("posting alert to %v", value)
@@ -147,9 +159,10 @@ func (alert Alert) removeOne(id string) error {
 }
 
 func (sendmail Sendmail) getOne(id string) (error, interface{}) {
-	var s db.Sendmail
-	return s.FindOne(id)
+	s := new(db.Sendmail)
+	return db.FindOne(s, db.GetId(id)), s
 }
+
 func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 	var s db.Sendmail
 	log.Printf("sendmail.action = [%v]", sendmail.action)
@@ -175,7 +188,11 @@ func (sendmail Sendmail) insert(decoder *json.Decoder) (error, interface{}) {
 
 		return err, s
 	} else {
-		return s.Insert(decoder)
+		err := decoder.Decode(&s)
+		if err != nil {
+			return err, s
+		}
+		return db.Insert(s), s
 	}
 }
 
