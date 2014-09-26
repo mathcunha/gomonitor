@@ -7,10 +7,10 @@ import (
 	"log"
 )
 
-var properties map[string]*json.RawMessage = loadConfig()
+var properties map[string]*json.RawMessage
 
-func loadConfig() map[string]*json.RawMessage {
-	body, err := ioutil.ReadFile("prop/config.json")
+func LoadConfig(config string) {
+	body, err := ioutil.ReadFile(config)
 
 	if err != nil {
 		log.Printf("error %v", err)
@@ -32,7 +32,7 @@ func loadConfig() map[string]*json.RawMessage {
 		*objmap["mongodb"] = json.RawMessage([]byte("127.0.0.1"))
 	}
 
-	return objmap
+	properties = objmap
 }
 
 func Property(key string) string {
