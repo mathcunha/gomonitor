@@ -10,6 +10,7 @@ type Alert struct {
 	Monitor Monitor       `bson:"monitor"         json:"monitor"`
 	Total   int           `bson:"total"        json:"total"`
 	When    time.Time     `bson:"when"            json:"when"`
+	Hits    string        `bson:"hits"           json:"hits"`
 }
 
 func (a Alert) collection() string {

@@ -20,6 +20,7 @@ func Evaluate(m db.Monitor) {
 	if err == nil && total > 0 {
 		var alert db.Alert
 		alert.Monitor = m
+		alert.Hits = hits
 		alert.Total = total
 		alert.When = time.Now()
 		PostAlert(alert)
