@@ -1,34 +1,18 @@
-package scheduler
+package es
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/mathcunha/gomonitor/db"
 	"github.com/mathcunha/gomonitor/prop"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
-func Evaluate(m db.Monitor) {
-	total, hits, err := getResource(m)
-	log.Printf("monitor = (%v) total = (%v) - hits = (%v)", m.Id, total, hits)
-
-	if err == nil && total > 0 {
-		var alert db.Alert
-		alert.Monitor = m
-		alert.Hits = hits
-		alert.Total = total
-		alert.When = time.Now()
-		PostAlert(alert)
-	}
-}
-
-func getResource(m db.Monitor) (int, string, error) {
-	body, _ := callElasticsearch(strings.Replace(m.Query, "\\", "", -1))
+func Search(query string) (int, string, error) {
+	body, _ := callElasticsearch(query)
 	//log.Printf(body)
 	var objmap map[string]*json.RawMessage
 	err := json.Unmarshal([]byte(body), &objmap)
@@ -55,13 +39,6 @@ func getResource(m db.Monitor) (int, string, error) {
 	b = []byte(*objmap["hits"])
 
 	return total, string(b[:]), nil
-}
-
-func PostAlert(alert db.Alert) {
-	var postData []byte
-	w := bytes.NewBuffer(postData)
-	json.NewEncoder(w).Encode(alert)
-	http.Post("http://"+prop.Property("gomonitor")+"/alert", "application/json", w)
 }
 
 func callElasticsearch(query string) (string, error) {
