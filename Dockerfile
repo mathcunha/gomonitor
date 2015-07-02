@@ -25,5 +25,6 @@ RUN chmod 777 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
+EXPOSE 8080
 # Set the file maintainer (your name - the file's author)
 MAINTAINER Matheus Cunha
