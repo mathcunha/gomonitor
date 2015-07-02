@@ -4,6 +4,9 @@ import (
 	"github.com/mathcunha/gomonitor/prop"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
+	"os"
+	"strings"
 )
 
 type Persistent interface {
@@ -13,7 +16,11 @@ type Persistent interface {
 const database = "gomonitor"
 
 func getSession() (*mgo.Session, error) {
-	session, err := mgo.Dial("mongodb://" + prop.Property("mongodb"))
+	endpoint := os.Getenv(prop.Property("mongodb"))
+	log.Printf("endpoint = %v", endpoint)
+	endpoint = strings.Replace(endpoint, "tcp", "mongodb", 1)
+	log.Printf("endpoint = %v", endpoint)
+	session, err := mgo.Dial(endpoint)
 	return session, err
 }
 

@@ -136,10 +136,14 @@ func (alert Alert) insert(decoder *json.Decoder) (interface{}, error) {
 		var postData []byte
 		w := bytes.NewBuffer(postData)
 		json.NewEncoder(w).Encode(alert_db)
-		http.Post("http://"+prop.Property("gomonitor")+"/"+value+"/action", "application/json", w)
+		resp, err := http.Post("http://"+prop.Property("gomonitor")+"/"+value+"/action", "application/json", w)
+		if err != nil {
+			return a, err
+		}
+		defer resp.Body.Close()
 	}
 
-	return a, err
+	return a, nil
 }
 
 func (alert Alert) getAll() (interface{}, error) {
