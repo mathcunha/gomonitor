@@ -5,6 +5,10 @@ What if your logstash metrics stored at Elasticsearch were monitored? Yeah...
 
 This projects aims to monitor the metrics colleted by logstash and take actions when something happens. Those actions could be send a email, or run a script, which are native to the project. But you can develop your own actions.
 
+<p align="center">
+  <img src="https://dl.dropboxusercontent.com/u/8824869/Context_Diagram__1_.png?height=197&width=400&height=198" alt="GoMonitor overview"/>
+</p>
+
 api
 =========
 To achieve that goal, Gomonitor exposes an REST API, this API has two major resources, Monitor, Actions (e.g Sendmail, etc.). The first represents what is been monitored (e.g. apache response time, JVM memory) and the second represents the action that should be taken when a monitor alerts.
