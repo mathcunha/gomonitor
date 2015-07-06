@@ -1,0 +1,35 @@
+gomonitor:
+   build: .
+   ports:
+    - "8080:8080"
+   links:
+    - mongodb
+    - elastic
+   volumes:
+    - ./config:/config
+elastic:
+   image: docker.io/elasticsearch
+   volumes:
+    - ./data/elastic:/usr/share/elasticsearch/data
+   ports:
+    - "9200:9200"
+    - "9300:9300"
+redis:
+   image: docker.io/redis
+   volumes:
+    - ./data/redis:/data
+   ports:
+    - "6379:6379"
+mongodb:
+   image: docker.io/mongo
+   volumes:
+    - ./data/mongo:/data/db
+   ports:
+    - "27017:27017"
+shipper:
+  build: ./config/shipper
+  volumes:
+    - ./config/shipper:/config-dir 
+  links:
+    - redis
+    - elastic
