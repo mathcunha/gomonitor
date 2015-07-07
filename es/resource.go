@@ -3,6 +3,7 @@ package es
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/mathcunha/gomonitor/prop"
 	"io/ioutil"
 	"log"
@@ -22,6 +23,11 @@ func Search(query string) (int, string, error) {
 	if err != nil {
 		log.Printf("error parsing ElasticSearch results - %v", err)
 		return -1, "", err
+	}
+
+	if objmap["hits"] == nil {
+		log.Printf("no results found, perhaps its a missing indice")
+		return -1, "", errors.New("no results found")
 	}
 
 	err = json.Unmarshal([]byte(*objmap["hits"]), &objmap)
