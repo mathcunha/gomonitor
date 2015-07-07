@@ -3,7 +3,7 @@ gomonitor:
    ports:
     - "8080:8080"
    links:
-    - mongodb
+    - mongo
     - elastic
    volumes:
     - ./config:/config
@@ -20,7 +20,7 @@ redis:
     - ./data/redis:/data
    ports:
     - "6379:6379"
-mongodb:
+mongo:
    image: docker.io/mongo
    volumes:
     - ./data/mongo:/data/db
