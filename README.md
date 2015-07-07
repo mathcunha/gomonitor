@@ -15,7 +15,7 @@ To achieve that goal, Gomonitor exposes an REST API, this API has two major reso
 
 setup
 =========
-After clone the project, you should edit de <i>prop/config.json</i> file, providing some basic informations, like elasticsearch and gomonitor url.
+After clone the project, you should edit de <i>config/config.json</i> file, providing some basic informations, like elasticsearch and gomonitor url.
 ```json
 {
 "elasticsearch" : "127.0.0.1:9200",
