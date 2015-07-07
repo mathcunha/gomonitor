@@ -7,7 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -45,7 +47,9 @@ func callElasticsearch(query string) (string, error) {
 	var postData []byte
 	w := bytes.NewBuffer(postData)
 	w.Write([]byte(query))
-	endpoint := "http://" + prop.Property("elasticsearch") + "/" + getIndex() + "/_search"
+	endpoint := os.Getenv(prop.Property("elasticsearch"))
+	endpoint = strings.Replace(endpoint, "tcp", "http", 1)
+	endpoint = endpoint + "/" + getIndex() + "/_search"
 
 	res, err := http.Post(endpoint, "application/json", w)
 

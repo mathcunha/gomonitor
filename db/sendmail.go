@@ -1,9 +1,7 @@
 package db
 
 import (
-	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 type Sendmail struct {
@@ -26,18 +24,4 @@ func (s Sendmail) FindAll() ([]Sendmail, error) {
 func (s Sendmail) FindByMonitor(m Monitor) (error, Sendmail) {
 	sendmail := new(Sendmail)
 	return FindOne(sendmail, bson.M{"monitor._id": m.Id}), *sendmail
-}
-
-func (s Sendmail) Action(decoder *json.Decoder) (Alert, error) {
-	var alert Alert
-	err := decoder.Decode(&alert)
-
-	if err != nil {
-		return alert, err
-	}
-
-	//TODO sendmail stuff
-	log.Printf("sending email - [%v]", alert.Monitor.Id)
-
-	return alert, err
 }

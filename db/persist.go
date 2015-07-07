@@ -4,7 +4,6 @@ import (
 	"github.com/mathcunha/gomonitor/prop"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"os"
 	"strings"
 )
@@ -17,9 +16,7 @@ const database = "gomonitor"
 
 func getSession() (*mgo.Session, error) {
 	endpoint := os.Getenv(prop.Property("mongodb"))
-	log.Printf("endpoint = %v", endpoint)
 	endpoint = strings.Replace(endpoint, "tcp", "mongodb", 1)
-	log.Printf("endpoint = %v", endpoint)
 	session, err := mgo.Dial(endpoint)
 	return session, err
 }
