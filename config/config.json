@@ -1,0 +1,6 @@
+{
+        "elasticsearch":"ELASTIC_PORT",
+        "smtp":"127.0.0.1:25",
+        "gomonitor":"0.0.0.0:8080",
+        "mongodb" : "MONGO_PORT"
+}
