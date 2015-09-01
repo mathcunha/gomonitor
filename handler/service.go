@@ -182,7 +182,7 @@ func (sendmail Sendmail) insert(decoder *json.Decoder) (interface{}, error) {
 			return alert, err
 		}
 
-		action.SimpleSendMail(s.From, s.To, fmt.Sprintf("%v", alert.Monitor.Id), fmt.Sprintf("%v", alert))
+		action.SimpleSendMail(s.From, s.To, alert.Monitor.Desc, fmt.Sprintf("%v", alert))
 
 		return alert, err
 	} else {

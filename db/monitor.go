@@ -14,6 +14,7 @@ type Monitor struct {
 	Intervalo string        `bson:"interval"        json:"interval"`
 	Actions   []string      `bson:"actions"         json:"actions"`
 	Hits      int           `bson:"hits"         json:"hits"`
+	Desc      string        `bson:"desc"        json:"desc"`
 }
 
 func (m Monitor) collection() string {
