@@ -8,7 +8,7 @@ gomonitor:
    volumes:
     - ./config:/config
 elastic:
-   image: docker.io/elasticsearch
+   image: docker.io/elasticsearch:2.2
    volumes:
     - ./data/elastic:/usr/share/elasticsearch/data
    ports:
@@ -34,7 +34,7 @@ shipper:
     - redis
     - elastic
 kibana:
-   image: docker.io/kibana
+   image: docker.io/kibana:4.4
    links:
     - elastic:elasticsearch
    ports:

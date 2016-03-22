@@ -10,7 +10,6 @@ input {
 
 output {
   elasticsearch {
-   host => "ELASTIC_PORT_9200_TCP_ADDR"
-   port => "9200-9300"
+   hosts => ["ELASTIC_PORT_9200_TCP_ADDR:9200"]
   }
 }
