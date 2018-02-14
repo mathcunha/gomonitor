@@ -6,7 +6,7 @@ What if your logstash metrics stored at Elasticsearch were monitored? Yeah...
 This projects aims to monitor the metrics colleted by logstash and take actions when something happens. Those actions could be send a email, or run a script, which are native to the project. But you can develop your own actions.
 
 <p align="center">
-  <img src="https://dl.dropboxusercontent.com/u/8824869/Context_Diagram__1_.png?height=197&width=400&height=198" alt="GoMonitor overview"/>
+  <img src="https://www.dropbox.com/s/4th8fudyglrxt9y/Context_Diagram__1_.png?dl=0&height=197&width=400&height=198" alt="GoMonitor overview"/>
 </p>
 
 api
